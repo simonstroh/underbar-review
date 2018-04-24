@@ -338,8 +338,7 @@
     var cache = {};
     return function(){
       if (cache[JSON.stringify(arguments)] === undefined) {
-        
-       cache[JSON.stringify(arguments)] = func.apply(null,arguments);
+       cache[JSON.stringify(arguments)] = func.apply(null, arguments);
      }
      return cache[JSON.stringify(arguments)];
     }
@@ -352,6 +351,10 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var args = Array.prototype.slice.call(arguments);
+    return setTimeout(function() {
+      func.apply(null, args.slice(2))
+    }, wait)
   };
 
 
@@ -366,6 +369,17 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    function getRandomArbitrary(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+    let copy = array.slice();
+    let result = [];
+    let length = result.length;
+    while (copy.length > 0){
+      result.splice(getRandomArbitrary(0,length),0,copy.pop());
+      length = result.length;
+    }
+    return result;
   };
 
 
