@@ -101,8 +101,18 @@
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
-      let cache = {};
-      let result = [];
+    let cache = {};
+    let result = [];
+    let iteratorArray = []
+    if(iterator){
+      _.each(array,function(item) {
+         
+          iteratorArray.push(iterator(item))
+        
+      })
+      _.uniq(iteratorArray)
+    }
+
     _.each(array,function(i,idx){
       if (!cache[i]) {
         result.push(i);
