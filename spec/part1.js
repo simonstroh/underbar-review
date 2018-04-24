@@ -332,7 +332,11 @@
         var iterator = function(value) { return value === 1; };
         var numbers = [1, 2, 2, 3, 4, 4];
 
+<<<<<<< HEAD
         expect(_.uniq(numbers, true, iterator)).to.eql([1]);
+=======
+        expect(_.uniq(numbers, true, iterator)).to.eql([1, 2]);
+>>>>>>> be97a742ec9926483c07ccc35cc9e395cfadc426
       });
 
       it('should produce a brand new array instead of modifying the input array', function() {

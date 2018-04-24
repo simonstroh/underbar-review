@@ -104,6 +104,7 @@
     let cache = {};
     let result = [];
     let iteratorArray = []
+
     if (iterator) {
       _.each(array, function(item) {
         if (iterator(item)) {
@@ -126,6 +127,7 @@
       })
       return result;
     }
+
   };
 
 
