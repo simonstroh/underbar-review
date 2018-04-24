@@ -104,20 +104,15 @@
     let cache = {};
     let result = [];
     let iteratorArray = []
-
     if (iterator) {
       _.each(array, function(item) {
-        if (iterator(item)) {
-          iteratorArray.push(item)
+        let transformed = iterator(item)
+        if (!cache[transformed]) {
+          iteratorArray.push(item);
+          cache[transformed] = true;
         }
       })
-      _.each(iteratorArray, function(i,idx) {
-        if (!cache[i]) {
-          result.push(i);
-          cache[i] = true;
-        }
-      })
-      return result;
+      return iteratorArray;
     } else {
       _.each(array, function(i,idx) {
         if (!cache[i]) {
@@ -127,7 +122,6 @@
       })
       return result;
     }
-
   };
 
 
@@ -136,6 +130,11 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+    var result = []
+    _.each(collection, function(item) {
+      result.push(iterator(item))
+    })
+    return result
   };
 
   /*
@@ -177,6 +176,20 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+    // [1, 2, 3], function() multiplies them all, 0
+    if (accumulator !== undefined) {
+      _.each(collection, function(item) {
+        accumulator = iterator(accumulator,item)
+      })
+      return accumulator
+    }
+    else {
+      accumulator = collection[0];
+      _.each(collection.slice(1), function(item) {
+        accumulator = iterator(accumulator,item)
+      })
+      return accumulator
+    }
   };
 
   // Determine if the array or object contains a given value (using `===`).
@@ -195,12 +208,49 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+    if (iterator !== undefined){
+      return _.reduce(collection, function(memo, item) {
+        if(!iterator(item)) {
+          memo = false;
+        }
+        return memo;
+      }, true)
+    }
+    else {
+      return _.reduce(collection, function(memo, item) {
+        if(!item) {
+          memo = false;
+        }
+        return memo;
+      }, true)
+    }
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    // _.each(collection, function(item) {
+    //   if (_.every(item, iterator)) {
+    //     result = true
+    //   }
+    // })
+    if (iterator !== undefined){
+      return _.reduce(collection, function(memo, item) {
+        if(iterator(item)) {
+          memo = true;
+        }
+        return memo
+      }, false)
+    }
+    else {
+      return _.reduce(collection, function(memo, item) {
+        if(item) {
+          memo = true;
+        }
+        return memo;
+      }, false)
+    }
   };
 
 
@@ -223,11 +273,25 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    for (var i = 1; i < arguments.length; i++) {
+      for (var property in arguments[i]) {
+        obj[property] = arguments[i][property]
+      }
+    }
+    return obj
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    for (var i = 1; i < arguments.length; i++) {
+      for (var property in arguments[i]) {
+        if (obj[property] === undefined) {
+          obj[property] = arguments[i][property]
+        }
+      }
+    }
+    return obj
   };
 
 
@@ -271,6 +335,14 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var cache = {};
+    return function(){
+      if (cache[JSON.stringify(arguments)] === undefined) {
+        
+       cache[JSON.stringify(arguments)] = func.apply(null,arguments);
+     }
+     return cache[JSON.stringify(arguments)];
+    }
   };
 
   // Delays a function for the given number of milliseconds, and then calls
