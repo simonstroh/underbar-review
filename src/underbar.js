@@ -104,22 +104,28 @@
     let cache = {};
     let result = [];
     let iteratorArray = []
-    if(iterator){
-      _.each(array,function(item) {
-         
-          iteratorArray.push(iterator(item))
-        
+    if (iterator) {
+      _.each(array, function(item) {
+        if (iterator(item)) {
+          iteratorArray.push(item)
+        }
       })
-      _.uniq(iteratorArray)
+      _.each(iteratorArray, function(i,idx) {
+        if (!cache[i]) {
+          result.push(i);
+          cache[i] = true;
+        }
+      })
+      return result;
+    } else {
+      _.each(array, function(i,idx) {
+        if (!cache[i]) {
+          result.push(i);
+          cache[i] = true;
+        }
+      })
+      return result;
     }
-
-    _.each(array,function(i,idx){
-      if (!cache[i]) {
-        result.push(i);
-        cache[i] = true;
-      }
-    })
-    return result;
   };
 
 
