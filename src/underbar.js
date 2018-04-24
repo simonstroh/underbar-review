@@ -7,6 +7,7 @@
   // seem very useful, but remember it--if a function needs to provide an
   // iterator when the user does not pass one in, this will be handy.
   _.identity = function(val) {
+    return val
   };
 
   /**
@@ -37,6 +38,10 @@
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
   _.last = function(array, n) {
+    if (n > array.length) {
+      return array;
+    }
+    return n === undefined ? array[array.length-1] : array.slice(array.length - n) 
   };
 
   // Call iterator(value, key, collection) for each element of collection.
@@ -45,6 +50,16 @@
   // Note: _.each does not have a return value, but rather simply runs the
   // iterator function over each item in the input collection.
   _.each = function(collection, iterator) {
+    if (Array.isArray(collection)) {
+      for (var i = 0; i < collection.length; i++) {
+        iterator(collection[i], i, collection)
+      }
+    }
+    else if (typeof collection === 'object') {
+      for (var property in collection) {
+        iterator(collection[property], property, collection)
+      }
+    }
   };
 
   // Returns the index at which value can be found in the array, or -1 if value
@@ -66,16 +81,45 @@
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
+    var newArray = []
+    _.each(collection, function(item) {
+      if(test(item)){newArray.push(item)}
+    })
+    return newArray
   };
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
+    var newArray = []
+    _.each(collection, function(item) {
+      if(!test(item)){newArray.push(item)}
+    })
+    return newArray
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
+    let cache = {};
+    let result = [];
+    let iteratorArray = []
+    if(iterator){
+      _.each(array,function(item) {
+         
+          iteratorArray.push(iterator(item))
+        
+      })
+      _.uniq(iteratorArray)
+    }
+
+    _.each(array,function(i,idx){
+      if (!cache[i]) {
+        result.push(i);
+        cache[i] = true;
+      }
+    })
+    return result;
   };
 
 
